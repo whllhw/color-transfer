@@ -6,6 +6,7 @@ import cv2
 import argparse
 import random
 import numpy as np
+from scipy import signal
 
 """
     图像尺寸变成1024*1024
@@ -38,17 +39,13 @@ def neighbour_standard_dev(img: np.ndarray):
     luminance = cv2.copyMakeBorder(luminance, r, r, r, r, cv2.BORDER_CONSTANT, value=0)
     result = np.zeros(img.shape)
     luminance_rows, luminance_cols = luminance.shape
+    # 使用卷积加速计算
+    mean = signal.convolve2d(luminance, np.ones((5, 5)) / 25, boundary='symm', mode='same')
     for i in range(r, luminance_rows - r):
         for j in range(r, luminance_cols - r):
-            mean = sum([luminance[m, n]
-                        for m in range(i - r, i + r + 1)
-                        for n in range(j - r, j + r + 1)])
-            mean /= 25
-            sdev = sum([pow(luminance[m, n] - mean, 2)
-                        for m in range(i - r, i + r + 1)
-                        for n in range(j - r, j + r + 1)])
-            sdev /= 25
-            result[i - r, j - r] = pow(sdev, 0.5)
+            sdev = np.sum(np.sum(np.power(luminance[i - r:i + r + 1, j - r:j + r + 1] - mean[i, j], 2))) / 25
+            result[i - r, j - r] = sdev
+    result = np.power(result, 0.5)
     return result
 
 
