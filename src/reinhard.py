@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-
+"""
+    implement reinhard's paper: Color Transfer between Images
+"""
 import cv2
 import numpy as np
 

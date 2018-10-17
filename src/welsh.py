@@ -1,5 +1,7 @@
 # coding:utf-8
-
+"""
+    try to implement welsh's paper: Transferring Color to Greyscale Images
+"""
 import cv2
 import argparse
 import random
@@ -40,8 +42,7 @@ def neighbour_standard_dev(img: np.ndarray):
         for j in range(r, luminance_cols - r):
             mean = sum([luminance[m, n]
                         for m in range(i - r, i + r + 1)
-                        for n in range(j - r, j + r + 1)
-                        ])
+                        for n in range(j - r, j + r + 1)])
             mean /= 25
             sdev = sum([pow(luminance[m, n] - mean, 2)
                         for m in range(i - r, i + r + 1)
