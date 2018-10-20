@@ -1,6 +1,6 @@
 # coding:utf-8
 """
-    try to implement welsh's paper: Transferring Color to Greyscale Images
+    try to implement welsh's paper: Transferring Color to GreyScale Images
 """
 import cv2
 import argparse
@@ -19,25 +19,25 @@ def jitter_sampling(img):
     samples_in_a_row = 16
     block_size = 1024 / 16
     jitter_samples = [
-        ((j * block_size) + (random.randint(0, block_size - 1)),
-         (i * block_size) + (random.randint(0, block_size - 1)))
+        (int(j * block_size) + (random.randint(0, block_size - 1)),
+         int(i * block_size) + (random.randint(0, block_size - 1)))
         for i in range(samples_in_a_row) for j in range(samples_in_a_row)]
-    return jitter_samples
+    return np.array(jitter_samples)
 
 
 def neighbour_standard_dev(img: np.ndarray):
-    if img.shape[2] == 3:
+    if len(img.shape) == 3 and img.shape[2] == 3:
         # channels = cv2.split(img)
         # luminance = channels[0]
         # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_core/py_basic_ops/py_basic_ops.html
         luminance = img[:, :, 0]
-    elif img.shape[2] == 1:
-        luminance = img[:, :, :]
+    elif len(img.shape) == 2:
+        luminance = img.copy()
     else:
         raise RuntimeError("Only available for 1 and 3 channel images")
     r = 2
     luminance = cv2.copyMakeBorder(luminance, r, r, r, r, cv2.BORDER_CONSTANT, value=0)
-    result = np.zeros(img.shape)
+    result = np.zeros(img.shape[:2])
     luminance_rows, luminance_cols = luminance.shape
     # 使用卷积加速计算
     mean = signal.convolve2d(luminance, np.ones((5, 5)) / 25, boundary='symm', mode='same')
@@ -51,15 +51,13 @@ def neighbour_standard_dev(img: np.ndarray):
 
 def colorize(reference, grey):
     jitter_samples = jitter_sampling(reference)
-    reference_sdev = neighbour_standard_dev(reference)
     grey_sdev = neighbour_standard_dev(grey)
+    reference_sdev = neighbour_standard_dev(reference)
 
-    sample_values = [
-        reference[jitter_samples[i][0], jitter_samples[i][1]][0] + reference_sdev[
-            jitter_samples[i][0], jitter_samples[i][1]]
-        for i in range(jitter_samples.__len__())
-    ]
-    result = np.zeros(grey.shape)
+    sample_values = reference[jitter_samples[:, 0], jitter_samples[:, 1], 0] + reference_sdev[
+        jitter_samples[:, 0], jitter_samples[:, 1]]
+
+    result = np.zeros((grey.shape[0], grey.shape[1], 3), dtype=np.uint8)
     for i in range(grey.shape[0]):
         for j in range(grey.shape[1]):
             value = grey[i, j] + grey_sdev[i, j]
@@ -69,7 +67,7 @@ def colorize(reference, grey):
             x, y = jitter_samples[min_index]
             hue = reference[x, y][1]
             sat = reference[x, y][2]
-            result[i, j] = grey[i, j], hue, sat
+            result[i, j] = (grey[i, j], hue, sat)
     return cv2.cvtColor(result, cv2.COLOR_LAB2BGR)
 
 
@@ -84,6 +82,5 @@ if __name__ == '__main__':
     ref = cv2.resize(ref, (1024, 1024))
     ref_lab = cv2.cvtColor(ref, cv2.COLOR_BGR2LAB)
 
-    grey = cv2.imread(args.grey_image)
-    colorize(ref_lab, grey)
-    # cv2.imwrite('output.jpg',colorize(ref_lab,grey))
+    grey = cv2.imread(args.grey_image, 0)
+    cv2.imwrite('output.jpg',colorize(ref_lab, grey))
