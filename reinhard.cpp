@@ -1,8 +1,9 @@
 // this file original copy from https://github.com/takahiro-itazuri/color-transfer-between-images/blob/master/src/main.cpp
 #include<iostream>
 #include<cmath>
-#include<opencv2\opencv.hpp>
-
+#include<opencv2/opencv.hpp>
+using namespace std;
+using namespace cv;
 const float eps = 1.0e-5;
 
 cv::Vec3d BGR2lab(cv::Vec3d bgr) {
@@ -145,10 +146,7 @@ int main(int argc, char* argv[]) {
 
 	dst_bgr.convertTo(dst, CV_8UC3, 255.0);
 
-	cv::imshow("src", src);
-	cv::imshow("ref", ref);
-	cv::imshow("dst", dst);
-	cv::waitKey(0);
+	imwrite("dst.jpg",dst);
 
 	return 0;
 }
