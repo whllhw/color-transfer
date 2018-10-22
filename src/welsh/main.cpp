@@ -119,20 +119,24 @@ Mat colorize(Mat &reference, Mat &grey){
 	return result;
 }
 
-int main(int argc, char** argv){
-	if (argc!=3){
-		cout << "Usage : ./a.out <template_colored_image> <grey_image>" << endl;
-		exit(0);
-	}
+extern "C" {
 
-	srand(time(NULL));
-	Mat ref = imread(argv[1]);
-	resize(ref, ref, Size(1024,1024));
-	Mat ref_lab;
-	cvtColor(ref, ref_lab, COLOR_BGR2Lab);
+    int welsh(char *template_colored_image, char *grey_image){
+        srand(time(NULL));
+        Mat ref = imread(template_colored_image);
+        resize(ref, ref, Size(1024,1024));
+        Mat ref_lab;
+        cvtColor(ref, ref_lab, COLOR_BGR2Lab);
 
-	Mat grey = imread(argv[2],0);
+        Mat grey = imread(grey_image,0);
 
-	Mat colored = colorize(ref_lab, grey);
-	imwrite("result.jpg", colored);
+        Mat colored = colorize(ref_lab, grey);
+        imwrite("result.jpg", colored);
+        return 0;
+    }
+
+    int test(){
+        cout << "welsh modules loaded."<<endl;
+        return 0;
+    }
 }

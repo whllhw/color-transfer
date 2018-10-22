@@ -39,114 +39,119 @@ cv::Vec3d lab2BGR(cv::Vec3d lab) {
 	return bgr;
 }
 
-int main(int argc, char* argv[]) {
-	cv::Mat src, ref, dst;
-	cv::Mat src_bgr, src_lab, ref_bgr, ref_lab, dst_bgr, dst_lab;
-	cv::Vec3d src_avg = 0, src_sd = 0, ref_avg = 0, ref_sd = 0;
+extern "C" {
+	int reinhard(char* src_file, char* ref_file) {
+		cv::Mat src, ref, dst;
+		cv::Mat src_bgr, src_lab, ref_bgr, ref_lab, dst_bgr, dst_lab;
+		cv::Vec3d src_avg = 0, src_sd = 0, ref_avg = 0, ref_sd = 0;
 
-	// load source image (BGR)
-	src = cv::imread("src.jpg", cv::IMREAD_COLOR);
-	// load reference image (BGR)
-	ref = cv::imread("ref.jpg", cv::IMREAD_COLOR);
+		// load source image (BGR)
+		src = cv::imread(src_file, cv::IMREAD_COLOR);
+		// load reference image (BGR)
+		ref = cv::imread(ref_file, cv::IMREAD_COLOR);
 
-	// convert uchar -> float
-	src.convertTo(src_bgr, CV_64FC3, 1 / 255.0);
-	ref.convertTo(ref_bgr, CV_64FC3, 1 / 255.0);
+		// convert uchar -> float
+		src.convertTo(src_bgr, CV_64FC3, 1 / 255.0);
+		ref.convertTo(ref_bgr, CV_64FC3, 1 / 255.0);
 
-	// initialization for conversion from BGR to lab
-	src_lab = cv::Mat(src_bgr.size(), CV_64FC3);
-	ref_lab = cv::Mat(ref_bgr.size(), CV_64FC3);
+		// initialization for conversion from BGR to lab
+		src_lab = cv::Mat(src_bgr.size(), CV_64FC3);
+		ref_lab = cv::Mat(ref_bgr.size(), CV_64FC3);
 
-	// BGR -> lab
-	for (int y = 0; y < src_bgr.rows; ++y) {
-		for (int x = 0; x < src_bgr.cols; ++x) {
-			src_lab.at<cv::Vec3d>(y, x) = BGR2lab(src_bgr.at<cv::Vec3d>(y, x));
+		// BGR -> lab
+		for (int y = 0; y < src_bgr.rows; ++y) {
+			for (int x = 0; x < src_bgr.cols; ++x) {
+				src_lab.at<cv::Vec3d>(y, x) = BGR2lab(src_bgr.at<cv::Vec3d>(y, x));
+			}
 		}
-	}
 
-	for (int y = 0; y < ref_bgr.rows; ++y) {
-		for (int x = 0; x < ref_bgr.cols; ++x) {
-			ref_lab.at<cv::Vec3d>(y, x) = BGR2lab(ref_bgr.at<cv::Vec3d>(y, x));
+		for (int y = 0; y < ref_bgr.rows; ++y) {
+			for (int x = 0; x < ref_bgr.cols; ++x) {
+				ref_lab.at<cv::Vec3d>(y, x) = BGR2lab(ref_bgr.at<cv::Vec3d>(y, x));
+			}
 		}
-	}
 
-	// calculate mean
-	src_avg = cv::Vec3d(0, 0, 0);
-	for (int y = 0, H = src_lab.rows; y < H; ++y) {
-		for (int x = 0, W = src_lab.cols; x < W; ++x) {
-			cv::Vec3d* buf = &src_lab.at<cv::Vec3d>(y, x);
-			src_avg[0] += (*buf)[0];
-			src_avg[1] += (*buf)[1];
-			src_avg[2] += (*buf)[2];
+		// calculate mean
+		src_avg = cv::Vec3d(0, 0, 0);
+		for (int y = 0, H = src_lab.rows; y < H; ++y) {
+			for (int x = 0, W = src_lab.cols; x < W; ++x) {
+				cv::Vec3d* buf = &src_lab.at<cv::Vec3d>(y, x);
+				src_avg[0] += (*buf)[0];
+				src_avg[1] += (*buf)[1];
+				src_avg[2] += (*buf)[2];
+			}
 		}
-	}
-	for (int c = 0; c < 3; ++c) {
-		src_avg[c] /= src_lab.rows * src_lab.cols;
-	}
-
-	ref_avg = cv::Vec3d(0, 0, 0);
-	for (int y = 0, H = ref_lab.rows; y < H; ++y) {
-		for (int x = 0, W = ref_lab.cols; x < W; ++x) {
-			cv::Vec3d* buf = &ref_lab.at<cv::Vec3d>(y, x);
-			ref_avg[0] += (*buf)[0];
-			ref_avg[1] += (*buf)[1];
-			ref_avg[2] += (*buf)[2];
+		for (int c = 0; c < 3; ++c) {
+			src_avg[c] /= src_lab.rows * src_lab.cols;
 		}
-	}
 
-	for (int c = 0; c < 3; ++c) {
-		ref_avg[c] /= ref_lab.rows * ref_lab.cols;
-	}
-
-	//calculate standard deviation
-	src_sd = cv::Vec3d(0, 0, 0);
-	for (int y = 0, H = src_lab.rows; y < H; ++y) {
-		for (int x = 0, W = src_lab.cols; x < W; ++x) {
-			cv::Vec3d* buf = &src_lab.at<cv::Vec3d>(y, x);
-			src_sd[0] += ((*buf)[0] - src_avg[0]) * ((*buf)[0] - src_avg[0]);
-			src_sd[1] += ((*buf)[1] - src_avg[1]) * ((*buf)[1] - src_avg[1]);
-			src_sd[2] += ((*buf)[2] - src_avg[2]) * ((*buf)[2] - src_avg[2]);
+		ref_avg = cv::Vec3d(0, 0, 0);
+		for (int y = 0, H = ref_lab.rows; y < H; ++y) {
+			for (int x = 0, W = ref_lab.cols; x < W; ++x) {
+				cv::Vec3d* buf = &ref_lab.at<cv::Vec3d>(y, x);
+				ref_avg[0] += (*buf)[0];
+				ref_avg[1] += (*buf)[1];
+				ref_avg[2] += (*buf)[2];
+			}
 		}
-	}
 
-	for (int c = 0; c < 3; ++c) {
-		src_sd[c] /= src_lab.rows * src_lab.cols;
-		src_sd[c] = std::sqrt(src_sd[c]);
-	}
-
-	ref_sd = cv::Vec3d(0, 0, 0);
-	for (int y = 0, H = ref_lab.rows; y < H; ++y) {
-		for (int x = 0, W = ref_lab.cols; x < W; ++x) {
-			cv::Vec3d* buf = &ref_lab.at<cv::Vec3d>(y, x);
-			ref_sd[0] += ((*buf)[0] - ref_avg[0]) * ((*buf)[0] - ref_avg[0]);
-			ref_sd[1] += ((*buf)[1] - ref_avg[1]) * ((*buf)[1] - ref_avg[1]);
-			ref_sd[2] += ((*buf)[2] - ref_avg[2]) * ((*buf)[2] - ref_avg[2]);
+		for (int c = 0; c < 3; ++c) {
+			ref_avg[c] /= ref_lab.rows * ref_lab.cols;
 		}
-	}
 
-	for (int c = 0; c < 3; ++c) {
-		ref_sd[c] /= ref_lab.rows * ref_lab.cols;
-		ref_sd[c] = std::sqrt(ref_sd[c]);
-	}
-
-	// initialization for output image
-	dst = cv::Mat(src.size(), CV_8UC3);
-	dst_bgr = cv::Mat(src_bgr.size(), CV_64FC3);
-
-	for (int y = 0; y < dst_bgr.rows; ++y) {
-		for (int x = 0; x < dst_bgr.cols; ++x) {
-			cv::Vec3d* buf = &src_lab.at<cv::Vec3d>(y, x);
-			float l = ref_sd[0] / src_sd[0] * ((*buf)[0] - src_avg[0]) + ref_avg[0];
-			float a = ref_sd[1] / src_sd[1] * ((*buf)[1] - src_avg[1]) + ref_avg[1];
-			float b = ref_sd[2] / src_sd[2] * ((*buf)[2] - src_avg[2]) + ref_avg[2];
-
-			dst_bgr.at<cv::Vec3d>(y, x) = lab2BGR(cv::Vec3d(l, a, b));
+		//calculate standard deviation
+		src_sd = cv::Vec3d(0, 0, 0);
+		for (int y = 0, H = src_lab.rows; y < H; ++y) {
+			for (int x = 0, W = src_lab.cols; x < W; ++x) {
+				cv::Vec3d* buf = &src_lab.at<cv::Vec3d>(y, x);
+				src_sd[0] += ((*buf)[0] - src_avg[0]) * ((*buf)[0] - src_avg[0]);
+				src_sd[1] += ((*buf)[1] - src_avg[1]) * ((*buf)[1] - src_avg[1]);
+				src_sd[2] += ((*buf)[2] - src_avg[2]) * ((*buf)[2] - src_avg[2]);
+			}
 		}
+
+		for (int c = 0; c < 3; ++c) {
+			src_sd[c] /= src_lab.rows * src_lab.cols;
+			src_sd[c] = std::sqrt(src_sd[c]);
+		}
+
+		ref_sd = cv::Vec3d(0, 0, 0);
+		for (int y = 0, H = ref_lab.rows; y < H; ++y) {
+			for (int x = 0, W = ref_lab.cols; x < W; ++x) {
+				cv::Vec3d* buf = &ref_lab.at<cv::Vec3d>(y, x);
+				ref_sd[0] += ((*buf)[0] - ref_avg[0]) * ((*buf)[0] - ref_avg[0]);
+				ref_sd[1] += ((*buf)[1] - ref_avg[1]) * ((*buf)[1] - ref_avg[1]);
+				ref_sd[2] += ((*buf)[2] - ref_avg[2]) * ((*buf)[2] - ref_avg[2]);
+			}
+		}
+
+		for (int c = 0; c < 3; ++c) {
+			ref_sd[c] /= ref_lab.rows * ref_lab.cols;
+			ref_sd[c] = std::sqrt(ref_sd[c]);
+		}
+
+		// initialization for output image
+		dst = cv::Mat(src.size(), CV_8UC3);
+		dst_bgr = cv::Mat(src_bgr.size(), CV_64FC3);
+
+		for (int y = 0; y < dst_bgr.rows; ++y) {
+			for (int x = 0; x < dst_bgr.cols; ++x) {
+				cv::Vec3d* buf = &src_lab.at<cv::Vec3d>(y, x);
+				float l = ref_sd[0] / src_sd[0] * ((*buf)[0] - src_avg[0]) + ref_avg[0];
+				float a = ref_sd[1] / src_sd[1] * ((*buf)[1] - src_avg[1]) + ref_avg[1];
+				float b = ref_sd[2] / src_sd[2] * ((*buf)[2] - src_avg[2]) + ref_avg[2];
+
+				dst_bgr.at<cv::Vec3d>(y, x) = lab2BGR(cv::Vec3d(l, a, b));
+			}
+		}
+
+		dst_bgr.convertTo(dst, CV_8UC3, 255.0);
+
+		imwrite("dst.jpg",dst);
+
+		return 0;
 	}
-
-	dst_bgr.convertTo(dst, CV_8UC3, 255.0);
-
-	imwrite("dst.jpg",dst);
-
-	return 0;
+	int test(){
+		cout << "reinhard modules loaded."<<endl;
+	}
 }
