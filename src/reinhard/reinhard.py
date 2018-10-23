@@ -5,14 +5,14 @@
 import cv2
 import numpy as np
 
-image = cv2.imread('images/desc.png')
+image = cv2.imread('src.jpg')
 # 转化颜色空间到 LAB 空间
 image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
-original = cv2.imread('images/src.png')
+original = cv2.imread('ref.jpg')
 original = cv2.cvtColor(original, cv2.COLOR_BGR2LAB)
 
 
-def get_avg_std(image: np.ndarray):
+def get_avg_std(image):
     """
         @return 图片的均值和标准差
     """
@@ -30,6 +30,8 @@ def get_avg_std(image: np.ndarray):
     std.append(image_std_l)
     std.append(image_std_a)
     std.append(image_std_b)
+    print(avg)
+    print(std)
     return avg, std
 
 
@@ -48,4 +50,4 @@ for i in range(0, height):
             image[i, j, k] = t
 
 image = cv2.cvtColor(image, cv2.COLOR_LAB2BGR)
-cv2.imwrite('outputs/out.jpg', image)
+cv2.imwrite('out.jpg', image)

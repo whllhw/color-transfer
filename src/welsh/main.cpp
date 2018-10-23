@@ -139,4 +139,8 @@ extern "C" {
         cout << "welsh modules loaded."<<endl;
         return 0;
     }
+
+	int main(){
+		return welsh("../../images/1c.jpg","../../images/1g.jpg");
+	}
 }
