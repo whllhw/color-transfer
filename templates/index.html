@@ -1,0 +1,26 @@
+<!doctype>
+<html>
+<title>Flaskr</title>
+<head>
+<script src='https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js'></script>
+</head>
+<body>
+	<form action="{{ url_for('upload') }}" method="POST" enctype=multipart/form-data>
+		<input type="file" name="file">
+		<input type='submit' value='Upload'>
+	</form>
+  <div id='list'>
+    
+  </div>
+</body>
+<script>
+$(()=>{
+  $.get("{{ url_for('get_list') }}",data=> {
+    console.log(data)
+    data[0].forEach( i =>{
+      $('#list').append(`<img src='/download/${i}'>`)
+    })
+  })
+});
+</script>
+</html>
