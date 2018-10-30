@@ -121,7 +121,7 @@ Mat colorize(Mat &reference, Mat &grey){
 
 extern "C" {
 
-    int welsh(char *template_colored_image, char *grey_image){
+    int welsh(char *grey_image, char *template_colored_image,char *out_img_path){
         srand(time(NULL));
         Mat ref = imread(template_colored_image);
         resize(ref, ref, Size(1024,1024));
@@ -131,7 +131,7 @@ extern "C" {
         Mat grey = imread(grey_image,0);
 
         Mat colored = colorize(ref_lab, grey);
-        imwrite("result.jpg", colored);
+        imwrite(out_img_path, colored);
         return 0;
     }
 
@@ -140,7 +140,4 @@ extern "C" {
         return 0;
     }
 
-	int main(){
-		return welsh("../../images/1c.jpg","../../images/1g.jpg");
-	}
 }

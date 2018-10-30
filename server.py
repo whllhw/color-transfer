@@ -4,6 +4,7 @@ import os
 from werkzeug.utils import secure_filename
 
 from src.reinhard.main import work as reinhard
+from src.welsh.main import work as welsh
 import time
 
 app = Flask(__name__)
@@ -49,11 +50,15 @@ def download(filename):
 def work():
     ref_img_filename = os.path.join(UPLOAD_FILE_PATH,secure_filename(request.args.get('ref_img')))
     src_img_filename = os.path.join(UPLOAD_FILE_PATH,secure_filename(request.args.get('src_img')))
+    al = request.args.get('alg','reinhard')
     if not os.path.isfile(ref_img_filename) or not os.path.isfile(src_img_filename):
         return jsonify({'msg':'file not exists','code':1})
     out_img = str(round(time.time() * 1000))+'.jpg'
     out_img_file = os.path.join(UPLOAD_FILE_PATH,out_img)
-    reinhard(src_img_filename,ref_img_filename,out_img_file)
+    if al == 'reinhard':
+        reinhard(src_img_filename,ref_img_filename,out_img_file)
+    elif al == 'welsh':
+        welsh(src_img_filename,ref_img_filename,out_img_file)
     return jsonify({'msg':'done','code':0,'url':url_for('download',filename=out_img)})
 
 if __name__ == '__main__':
