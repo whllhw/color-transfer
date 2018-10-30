@@ -1,26 +1,51 @@
 <!doctype>
 <html>
 <title>Flaskr</title>
+
 <head>
-<script src='https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js'></script>
+	<script src='https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js'></script>
 </head>
+
 <body>
+    <button id='work'>test</button>
+    <div id='result'>
+
+    </div>
 	<form action="{{ url_for('upload') }}" method="POST" enctype=multipart/form-data>
 		<input type="file" name="file">
 		<input type='submit' value='Upload'>
 	</form>
-  <div id='list'>
-    
-  </div>
+	<div id='list'>
+
+	</div>
 </body>
 <script>
 $(()=>{
   $.get("{{ url_for('get_list') }}",data=> {
     console.log(data)
     data[0].forEach( i =>{
-      $('#list').append(`<img src='/download/${i}'>`)
+      $('#list').append(`<div><img src='{{ url_for('download',filename='') }}${i}'><button id='del' onclick='del("${i}")'>删除</button></div>`)
     })
-  })
+  });
 });
+$(()=>{
+    $('#work').click(()=>{
+        $.get('{{ url_for('work') }}',{src_img:'src.jpg',ref_img:'ref.jpg'})
+        .done((res)=>{
+            if (res.code === 0){
+            $('#result').append(`<img src='${res.url}'>`)
+            }
+        });
+    });
+})
+function del(filename){
+      $.ajax({
+            url: `{{ url_for('delete',filename='') }}${filename}`,
+            method: 'DELETE',
+            success: (res)=>{
+                console.log(res.data.msg)
+            }
+        })
+}
 </script>
 </html>
