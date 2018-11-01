@@ -26,50 +26,11 @@ function submitform(e) {
             $('.help-block').remove();
             $('#upl').remove();
             var errors = JSON.parse(resp.responseText);
-            for (error in errors['errors']) {
-                if (error == '__all__')
-                    $(e).before('<div id="upl" class="alert alert-danger">' + errors['errors'][error] + '</div>');
-                else {
-                    $('#id_' + error).parents('.form-group:first').addClass('has-error');
-                    $('#id_' + error).after('<span class="help-block">' + errors['errors'][error] + '</span>')
-                }
-            }
+            $(e).before('<div id="upl" class="alert alert-danger">' + errors['msg'] + '</div>');
         }
     });
 }
-function user_exists() {
-    var mail = $('#id_email').val();
-    if (mail != '') {
-        $.ajax({
-            type: "POST",
-            url: '/userexists/',
-            data: {
-                'mail': mail
-            },
-            success: function(data) {
-                $('#id_password').parents('.form-group:first').show();
-            },
-            error: function(resp) {
-                $('#id_password').parents('.form-group:first').hide();
-            }
-        });
-    } else {
-        $('#id_password').parents('.form-group:first').hide();
-    }
-}
-function like(id_hash) {
-    $.ajax({
-        type: "GET",
-        url: '/like/',
-        data: {
-            "id_hash": id_hash
-        },
-        success: function(data) {
-            $('#num-likes' + id_hash).html(data);
-            $('#btn-likes' + id_hash).html(data);
-        }
-    });
-}
+
 var loading = false;
 function load_latest(url) {
     var last = $('.artwork-row').children().last();
