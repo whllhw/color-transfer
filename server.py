@@ -8,6 +8,8 @@ from src.welsh.main import work as welsh
 import time
 import sqlite3
 from db import *
+import sys
+os.environ['LD_LIBRARY_PATH'] = './lib'
 
 app = Flask(__name__,static_url_path='')
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
@@ -80,8 +82,7 @@ def work():
     elif al == 'welsh':
         welsh(src_img_filename,ref_img_filename,out_img_file)
     else:
-        pass
-        # abort(400)
+        abort(400)
     insert_file(out_img.split('.')[0],src_img,ref_img,out_img,al)
     return jsonify({'redirect':'show'})
 
@@ -106,4 +107,4 @@ def submission_del(id):
     return redirect('show')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,port=8080,host='0.0.0.0')

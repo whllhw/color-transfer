@@ -13,6 +13,7 @@
 </head>
 
 <body>
+
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
@@ -23,43 +24,13 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <!-- <a class="navbar-brand" href="#"><img src="./Create a new artwork_files/logo-45.png" id="logo" alt="deepart.io"></a> -->
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>
-                        <a href="latest/">Latest artworks</a>
-                    </li>
-                    <li class="active">
-                        <a href="" style="font-weight: bold; text-decoration: underline;">CREATE YOUR OWN</a>
-                    </li>
-                    <li>
-                        <a href="video/">Videos</a>
-                    </li>
-                    <li>
-                        <a href="pricing/">Offer</a>
-                    </li>
-                    <li>
-                        <a href="page/about/">About</a>
-                    </li>
+                    <li><a href="/" style="font-weight: bold; text-decoration: underline;">CREATE YOUR OWN</a></li>
                 </ul>
                 <ul class="nav navbar-nav pull-right">
-
-                    <!--li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">lhw990230292@gmail.com <span class="caret"></span></a>
-              <ul class="dropdown-menu"-->
-                    <li>
-                        <a class="nav-glyphicon" href="image/submissions/">My images</a>
-                    </li>
-                    <li>
-                        <a class="nav-glyphicon" href="profile/" title="Settings"><span class="glyphicon glyphicon-cog"></span></a>
-                    </li>
-                    <li>
-                        <a class="nav-glyphicon" href="logout/" title="Logout"><span class="glyphicon glyphicon-log-out"></span></a>
-                    </li>
-                    <!--/ul>
-            </li-->
-
+                    <li class="active"><a class="nav-glyphicon" href="/show">My images</a></li>
                 </ul>
             </div>
         </div>
@@ -140,7 +111,12 @@
                 action="work">
                 <input id="id_content_img" maxlength="40" name="src_img" type="hidden" value="">
                 <input id="id_style_img" maxlength="40" name="ref_img" type="hidden" value="">
-                <input id="alg_chosen" name="alg" type="hidden" value="">
+                <div class="text-center">
+<select name="alg">
+<option value="reinhard">reinhard</option>
+<option value="welsh">welsh</option>
+</select>
+                </div>
                 <div class="text-center">
                     <button type="submit" class="btn btn-primary">
                         Submit
