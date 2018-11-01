@@ -1,7 +1,5 @@
 # coding:utf-8
 import ctypes
-import sys
-print(sys.path )
 def work(src_img,ref_img,out_img):
     so = ctypes.cdll.LoadLibrary
     lib = so('src/reinhard/libReinhard.so')

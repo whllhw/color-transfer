@@ -24,7 +24,7 @@ def teardown_request(exception):
         
 @app.route('/')
 def index():
-    return redirect('index.htm')
+    return send_from_directory('static','index.htm')
 
 @app.route('/file/<path:filename>',methods=['DELETE'])
 def delete(filename):
@@ -39,20 +39,19 @@ def delete(filename):
 @app.route('/file/<types>',methods=['POST'])
 def upload(types):
     if 'file' not in request.files:
-        # flash('No file part')
         abort(400)
     file = request.files['file']
-    if file:
-        filename = secure_filename(file.filename)
-        if types == 'src':
-            filename = 'src_' + filename
-        else:
-            filename = 'ref_' + filename
-        file.save(os.path.join(UPLOAD_FILE_PATH, filename))
-        return jsonify({'hash':filename})
-        # return redirect('/')
+    if not file:
+        abort(400)
+    filename = secure_filename(file.filename)
+    if types == 'src':
+        filename = 'src_' + filename
+    elif types == 'ref':
+        filename = 'ref_' + filename
     else:
         abort(400)
+    file.save(os.path.join(UPLOAD_FILE_PATH, filename))
+    return jsonify({'hash':filename})
 
 @app.route('/file/<types>',methods=['GET'])
 def get_list(types):
@@ -67,8 +66,10 @@ def download(filename):
 
 @app.route('/work')
 def work():
-    ref_img_filename = os.path.join(UPLOAD_FILE_PATH,secure_filename(request.args.get('ref_img')))
-    src_img_filename = os.path.join(UPLOAD_FILE_PATH,secure_filename(request.args.get('src_img')))
+    ref_img = request.args.get('ref_img')
+    ref_img_filename = os.path.join(UPLOAD_FILE_PATH,secure_filename(ref_img))
+    src_img = request.args.get('src_img')
+    src_img_filename = os.path.join(UPLOAD_FILE_PATH,secure_filename(src_img))
     al = request.args.get('alg','reinhard')
     if not os.path.isfile(ref_img_filename) or not os.path.isfile(src_img_filename):
         return jsonify({'msg':'file not exists','code':1}),400
@@ -79,9 +80,30 @@ def work():
     elif al == 'welsh':
         welsh(src_img_filename,ref_img_filename,out_img_file)
     else:
-        abort(400)
-    insert_file(out_img.split('.')[0],src_img,ref_img,al)
-    return jsonify({'msg':'done','code':0,'url':url_for('download',filename=out_img)})
+        pass
+        # abort(400)
+    insert_file(out_img.split('.')[0],src_img,ref_img,out_img,al)
+    return jsonify({'redirect':'show'})
+
+@app.route('/show')
+def show():
+    return send_from_directory('static','submission.html')
+
+@app.route('/submission')
+def submission():
+    return jsonify(query_db('select * from result'))
+
+@app.route('/submission/del/<int:id>')
+def submission_del(id):
+    row = query_db('select * from result where id = ?',(id,),one=True)
+    filenames = [row['src_img'],row['ref_img'],row['res_img']]
+    for i in filenames:
+        try:
+            os.remove(os.path.join(UPLOAD_FILE_PATH,i))
+        except IOError:
+            pass
+    del_file(id)
+    return redirect('show')
 
 if __name__ == '__main__':
-    app.run(port=8080,host='0.0.0.0',debug=True)
+    app.run(debug=True)
