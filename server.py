@@ -74,7 +74,7 @@ def work():
     src_img_filename = os.path.join(UPLOAD_FILE_PATH,secure_filename(src_img))
     al = request.args.get('alg','reinhard')
     if not os.path.isfile(ref_img_filename) or not os.path.isfile(src_img_filename):
-        return jsonify({'msg':'file not exists','code':1}),400
+        return jsonify({'msg':'请选择图片','code':1}),400
     out_img = str(round(time.time() * 1000))+'.jpg'
     out_img_file = os.path.join(UPLOAD_FILE_PATH,out_img)
     if al == 'reinhard':
