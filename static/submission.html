@@ -23,28 +23,13 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/#"><img src="https://deepart-io.s3.amazonaws.com/img/logo-45.png" id="logo"
-                        alt="deepart.io"></a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="/latest/">Latest artworks</a></li>
-                    <li><a href="/hire/" style="font-weight: bold; text-decoration: underline;">CREATE YOUR OWN</a></li>
-                    <li><a href="/video/">Videos</a></li>
-                    <li><a href="/pricing/">Offer</a></li>
-                    <li><a href="/page/about/">About</a></li>
+                    <li><a href="/" style="font-weight: bold; text-decoration: underline;">CREATE YOUR OWN</a></li>
                 </ul>
                 <ul class="nav navbar-nav pull-right">
-
-                    <!--li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">lhw990230292@gmail.com <span class="caret"></span></a>
-              <ul class="dropdown-menu"-->
-                    <li class="active"><a class="nav-glyphicon" href="/image/submissions/">My images</a></li>
-                    <li><a class="nav-glyphicon" href="/profile/" title="Settings"><span class="glyphicon glyphicon-cog"></span></a></li>
-                    <li><a class="nav-glyphicon" href="/logout/" title="Logout"><span class="glyphicon glyphicon-log-out"></span></a></li>
-                    <!--/ul>
-            </li-->
-
+                    <li class="active"><a class="nav-glyphicon" href="/show">My images</a></li>
                 </ul>
             </div>
         </div>
@@ -81,7 +66,8 @@
                     $('.artwork-row').append(`<h4></h4>
                 <div class="row submissions submission likes" id="${i.id}">
                     <div class="col-md-3 col-sm-4 col-xs-12 text-center">
-                        <a href="download/${i.res_img}/"><img class="img-responsive" style="margin-bottom: 1em" src="download/${i.res_img}"></a>
+                    <a href="download/${i.res_img}">
+                        <img class="img-responsive" style="margin-bottom: 1em" src="download/${i.res_img}"></a>
                     </div>
                     <div class="col-md-3 col-sm-4 col-xs-6 text-center">
                         <a href="download/${i.src_img}"><img class="img-responsive"
@@ -102,11 +88,6 @@
                 }
             })
         })
-        $(window).scroll(function () {
-            if ($(window).scrollTop() > $(document).height() - $(window).height() - 2000) {
-                load_latest('/image/submissions/')
-            }
-        });
     </script>
 </body>
 

@@ -8,6 +8,8 @@ from src.welsh.main import work as welsh
 import time
 import sqlite3
 from db import *
+import sys
+os.environ['LD_LIBRARY_PATH'] = './lib'
 
 app = Flask(__name__,static_url_path='')
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
@@ -72,7 +74,7 @@ def work():
     src_img_filename = os.path.join(UPLOAD_FILE_PATH,secure_filename(src_img))
     al = request.args.get('alg','reinhard')
     if not os.path.isfile(ref_img_filename) or not os.path.isfile(src_img_filename):
-        return jsonify({'msg':'file not exists','code':1}),400
+        return jsonify({'msg':'请选择图片','code':1}),400
     out_img = str(round(time.time() * 1000))+'.jpg'
     out_img_file = os.path.join(UPLOAD_FILE_PATH,out_img)
     if al == 'reinhard':
@@ -80,8 +82,7 @@ def work():
     elif al == 'welsh':
         welsh(src_img_filename,ref_img_filename,out_img_file)
     else:
-        pass
-        # abort(400)
+        abort(400)
     insert_file(out_img.split('.')[0],src_img,ref_img,out_img,al)
     return jsonify({'redirect':'show'})
 
@@ -112,4 +113,4 @@ def submission_del(id):
     return redirect('show')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,port=8080,host='0.0.0.0')
