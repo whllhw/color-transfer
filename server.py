@@ -101,7 +101,8 @@ def submission_del(id):
     for row_name in row:
         if row[row_name] not in filenames:
             continue
-        if 1 < query_db('select count(1) from result where %s = ?1'.format(row_name),(row[row_name],),one=True):
+        size = query_db('select count(1) from result where {} = ?1'.format(row_name),(row[row_name],),one=True)
+        if 1 < int(size['count(1)']):
             filenames.remove(row[row_name])
 
     for i in filenames:
@@ -110,7 +111,7 @@ def submission_del(id):
         except IOError:
             pass
     del_file(id)
-    return redirect('show')
+    return redirect(url_for('show',_external=True))
 
 if __name__ == '__main__':
     app.run(debug=True,port=8080,host='0.0.0.0')
