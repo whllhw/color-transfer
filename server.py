@@ -97,6 +97,12 @@ def submission():
 def submission_del(id):
     row = query_db('select * from result where id = ?',(id,),one=True)
     filenames = [row['src_img'],row['ref_img'],row['res_img']]
+    for row_name in row:
+        if row[row_name] not in filenames:
+            continue
+        if 1 < query_db('select count(1) from result where %s = ?1'.format(row_name),(row[row_name],),one=True):
+            filenames.remove(row[row_name])
+
     for i in filenames:
         try:
             os.remove(os.path.join(UPLOAD_FILE_PATH,i))
