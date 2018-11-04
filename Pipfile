@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 opencv-python = "*"
 scipy = "*"
+flask = "*"
 
 [dev-packages]
 rope = "*"

@@ -64,7 +64,7 @@ def get_list(types):
 
 @app.route('/download/<path:filename>')
 def download(filename):
-    return send_from_directory(UPLOAD_FILE_PATH,filename, as_attachment=True)
+    return send_from_directory(UPLOAD_FILE_PATH,filename, cache_timeout=3600)
 
 @app.route('/work')
 def work():
@@ -97,7 +97,7 @@ def submission():
 @app.route('/submission/del/<int:id>')
 def submission_del(id):
     row = query_db('select * from result where id = ?',(id,),one=True)
-    filenames = [row['src_img'],row['ref_img'],row['res_img']]
+    filenames = [row['src_img'],row['res_img']]
     for row_name in row:
         if row[row_name] not in filenames:
             continue
@@ -114,4 +114,4 @@ def submission_del(id):
     return redirect(url_for('show',_external=True))
 
 if __name__ == '__main__':
-    app.run(debug=True,port=8080,host='0.0.0.0')
+    app.run(port=8080)
