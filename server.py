@@ -59,7 +59,7 @@ def upload(types):
 def get_list(types):
     files = next(os.walk(UPLOAD_FILE_PATH))[2]
     files = list(filter(lambda x:x.startswith(types),files))
-    files.sort(key=lambda f:os.stat(os.path.join(UPLOAD_FILE_PATH,f)).st_mtime)
+    files.sort(key=lambda f:os.stat(os.path.join(UPLOAD_FILE_PATH,f)).st_mtime,reverse=True)
     return jsonify(files)
 
 @app.route('/download/<path:filename>')
@@ -92,12 +92,12 @@ def show():
 
 @app.route('/submission')
 def submission():
-    return jsonify(query_db('select * from result'))
+    return jsonify(query_db('select * from result order by id desc'))
 
 @app.route('/submission/del/<int:id>')
 def submission_del(id):
     row = query_db('select * from result where id = ?',(id,),one=True)
-    filenames = [row['src_img'],row['res_img']]
+    filenames = [row['src_img'],row['res_img'],row['ref_img']]
     for row_name in row:
         if row[row_name] not in filenames:
             continue
@@ -114,4 +114,5 @@ def submission_del(id):
     return redirect(url_for('show',_external=True))
 
 if __name__ == '__main__':
+    app.debug = True
     app.run(port=8080)

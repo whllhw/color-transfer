@@ -6,7 +6,7 @@
     <style id="stndz-style"></style>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Create a new artwork</title>
-    <link href="css/googlefont.css" rel="stylesheet" type="text/css">
+    <!-- <link href="css/googlefont.css" rel="stylesheet" type="text/css"> -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/b1d598bc0794.css" type="text/css">
     <link rel="stylesheet" href="css/44ccd66c877e.css" type="text/css">
@@ -27,10 +27,10 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="/" style="font-weight: bold; text-decoration: underline;">CREATE YOUR OWN</a></li>
+                    <li><a href="/" style="font-weight: bold; text-decoration: underline;">开始创作</a></li>
                 </ul>
                 <ul class="nav navbar-nav pull-right">
-                    <li class="active"><a class="nav-glyphicon" href="/show">My images</a></li>
+                    <li class="active"><a class="nav-glyphicon" href="/show">我的上传</a></li>
                 </ul>
             </div>
         </div>
@@ -52,11 +52,11 @@
                     <ul class="nav nav-tabs">
 
                         <li class="active">
-                            <a data-toggle="tab" href="#my-photos" class="tab" aria-expanded="true">My photos</a>
+                            <a data-toggle="tab" href="#my-photos" class="tab" aria-expanded="true">我的图片</a>
                         </li>
 
                         <li class="">
-                            <a data-toggle="tab" href="#upload-photo" class="tab" aria-expanded="false">Upload photo</a>
+                            <a data-toggle="tab" href="#upload-photo" class="tab" aria-expanded="false">上传图片</a>
                         </li>
                     </ul>
                     <div class="tab-content" data-input="id_content_img">
@@ -80,11 +80,11 @@
                     <h1>Style</h1>
                     <ul class="nav nav-tabs">
                         <li class="active">
-                            <a data-toggle="tab" href="#popular-styles" class="tab" aria-expanded="true">My styles</a>
+                            <a data-toggle="tab" href="#popular-styles" class="tab" aria-expanded="true">参考图片</a>
                         </li>
 
                         <li class="">
-                            <a data-toggle="tab" href="#upload-style" class="tab" aria-expanded="false">Upload style</a>
+                            <a data-toggle="tab" href="#upload-style" class="tab" aria-expanded="false">上传参考图片</a>
                         </li>
 
                     </ul>
@@ -111,14 +111,14 @@
                 action="work">
                 <input id="id_content_img" maxlength="40" name="src_img" type="hidden" value="">
                 <input id="id_style_img" maxlength="40" name="ref_img" type="hidden" value="">
-                        ALGORITHM YOU CHOOSE
+                        选择算法
 <select name="alg">
-<option value="reinhard">reinhard</option>
-<option value="welsh">welsh</option>
+<option value="reinhard">Reinhard</option>
+<option value="welsh">Welsh</option>
 </select>
                     <div class="text-center">
                     <button type="submit" class="btn btn-primary">
-                        Submit
+                        提交
                     </button>
 
                     </div>

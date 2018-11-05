@@ -6,7 +6,7 @@
     <style id="stndz-style"></style>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>My submissions</title>
-    <link href="css/googlefont.css" rel="stylesheet" type="text/css">
+    <!-- <link href="css/googlefont.css" rel="stylesheet" type="text/css"> -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/b1d598bc0794.css" type="text/css">
 </head>
@@ -26,10 +26,10 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="/" style="font-weight: bold; text-decoration: underline;">CREATE YOUR OWN</a></li>
+                    <li><a href="/" style="font-weight: bold; text-decoration: underline;">开始创作</a></li>
                 </ul>
                 <ul class="nav navbar-nav pull-right">
-                    <li class="active"><a class="nav-glyphicon" href="/show">My images</a></li>
+                    <li class="active"><a class="nav-glyphicon" href="/show">我的上传</a></li>
                 </ul>
             </div>
         </div>
@@ -38,14 +38,13 @@
     <div class="content-container">
         <div class="container">
             <div class="page-header">
-                <h1>My submissions</h1>
+                <h1>我的提交</h1>
             </div>
         </div>
 
         <div class="container">
 
-            <div class="text-center"><a href="/" class="btn btn-default" style="margin-bottom: 20px">Submit a new
-                    photo</a></div>
+            <div class="text-center"><a href="/" class="btn btn-default" style="margin-bottom: 20px">提交图片</a></div>
 
             <div class="artwork-row">
 
@@ -62,6 +61,10 @@
     <script>
         $(function () {
             $.get('submission',function (data) {
+                if (data.length == 0){
+                    $('.artwork-row').append('<div class="alert-danger alert">没有提交</div>');
+                    return;
+                }
                 for (i of data){
                     $('.artwork-row').append(`<h4></h4>
                 <div class="row submissions submission likes" id="${i.id}">
@@ -78,9 +81,8 @@
                                 src="download/${i.ref_img}"></a>
                     </div>
                     <div class="col-md-3 col-sm-12 col-xs-12 text-center">
-                        <h4 style="text-transform: none">DeepArtwork ${i.id}</h4>
+                        <h4 style="text-transform: none">${i.alg} - ${window.btoa(i.id)} </h4>
                         <div class="btn-group" role="group" aria-label="...">
-                            <a class="btn btn-primary" href="#">${i.alg}</a>
                             <a class="btn btn-default" href="submission/del/${i.id}">Delete</a>
                         </div>
                     </div>
