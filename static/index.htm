@@ -212,6 +212,32 @@
                 bind_img();
             });
         }
+        let submitting = false;
+        function submitform(e) {
+            $('.success').remove();
+            if (submitting){
+                $(e).before('<div id="upl" class="alert alert-danger">已提交，正在处理，请稍后</div>');
+                return;
+            }
+            submitting = true;
+            $.ajax({
+                type: "GET",
+                url: $(e).attr('action'),
+                data: $(e).serialize(),
+                success: function(data) {
+                    process_response(data, e);
+                    submitting = false;
+                },
+                error: function(resp) {
+                    $('.form-group').removeClass('has-error');
+                    $('.help-block').remove();
+                    $('#upl').remove();
+                    var errors = JSON.parse(resp.responseText);
+                    $(e).before('<div id="upl" class="alert alert-danger">' + errors['msg'] + '</div>');
+                    submitting = false;
+                }
+            });
+        }
     </script>
     <script src="js/lightbox.min.js"></script>
 

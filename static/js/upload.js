@@ -12,33 +12,6 @@ function process_response(data, replacement) {
         document.location.href = data['redirect']
     }
 }
-let submitting = false;
-function submitform(e) {
-    $('.success').remove();
-    if (submitting){
-        alert("已提交，正在处理，请稍后");
-        return;
-    }
-    submitting = true;
-    $.ajax({
-        type: "GET",
-        url: $(e).attr('action'),
-        data: $(e).serialize(),
-        success: function(data) {
-            process_response(data, e);
-            submitting = false;
-        },
-        error: function(resp) {
-            $('.form-group').removeClass('has-error');
-            $('.help-block').remove();
-            $('#upl').remove();
-            var errors = JSON.parse(resp.responseText);
-            $(e).before('<div id="upl" class="alert alert-danger">' + errors['msg'] + '</div>');
-            submitting = false;
-        }
-    });
-}
-
 var loading = false;
 function load_latest(url) {
     var last = $('.artwork-row').children().last();
