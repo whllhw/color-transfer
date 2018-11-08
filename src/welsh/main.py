@@ -1,11 +1,18 @@
 # coding:utf-8
-import ctypes
+from multiprocessing import Process
+
+def do_work(src_img,ref_img,out_img):
+    import ctypes
+    import _ctypes
+    welsh_lib = ctypes.cdll.LoadLibrary('src/welsh/libWelsh.so')
+    welsh_lib.welsh(ctypes.c_char_p(src_img.encode('utf-8')), ctypes.c_char_p(ref_img.encode('utf-8')),ctypes.c_char_p(out_img.encode('utf-8')))
+    _ctypes.dlclose(welsh_lib._handle)
 
 def work(src_img,ref_img,out_img):
-    so = ctypes.cdll.LoadLibrary
-    lib = so('src/welsh/libWelsh.so')
-    lib.test()
-    lib.welsh(ctypes.c_char_p(src_img.encode('utf-8')), ctypes.c_char_p(ref_img.encode('utf-8')),ctypes.c_char_p(out_img.encode('utf-8')))
+    p = Process(target=do_work,args=(src_img,ref_img,out_img))
+    p.start()
+    p.join()
 
 if __name__ == '__main__':
-    work('../../images/1g.jpg','../../images/1c.jpg','result.jpg')
+    # while True:
+    work('uploads/src_1g.jpg','uploads/ref_1c.jpg','result.jpg')
