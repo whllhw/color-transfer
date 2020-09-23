@@ -1,44 +1,48 @@
-#coding:utf-8
-from flask import Flask,request,send_from_directory,flash,redirect,url_for,abort,jsonify,render_template,g
+# coding:utf-8
+from flask import Flask, request, send_from_directory, flash, redirect, url_for, abort, jsonify, render_template, g
 import os
 from werkzeug.utils import secure_filename
 
 from src.reinhard.main import work as reinhard
 from src.welsh.main import work as welsh
 import time
-import sqlite3
 from db import *
-import sys
+
 os.environ['LD_LIBRARY_PATH'] = './lib'
 
-app = Flask(__name__,static_url_path='')
+app = Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 UPLOAD_FILE_PATH = 'uploads/'
+
 
 @app.before_request
 def before_request():
     g.db = connect_db()
 
+
 @app.teardown_request
 def teardown_request(exception):
     if hasattr(g, 'db'):
         g.db.close()
-        
+
+
 @app.route('/')
 def index():
-    return send_from_directory('static','index.htm')
+    return send_from_directory('static', 'index.htm')
 
-@app.route('/file/<path:filename>',methods=['DELETE'])
+
+@app.route('/file/<path:filename>', methods=['DELETE'])
 def delete(filename):
     filename = secure_filename(filename)
-    filepath = os.path.join(UPLOAD_FILE_PATH,filename)
+    filepath = os.path.join(UPLOAD_FILE_PATH, filename)
     if os.path.isfile(filepath):
         os.remove(filepath)
-        return jsonify({'msg':'删除成功','code':0})
+        return jsonify({'msg': '删除成功', 'code': 0})
     else:
-        return jsonify({'msg':'删除失败','code':1})
+        return jsonify({'msg': '删除失败', 'code': 1})
 
-@app.route('/file/<types>',methods=['POST'])
+
+@app.route('/file/<types>', methods=['POST'])
 def upload(types):
     if 'file' not in request.files:
         abort(400)
@@ -53,66 +57,73 @@ def upload(types):
     else:
         abort(400)
     file.save(os.path.join(UPLOAD_FILE_PATH, filename))
-    return jsonify({'hash':filename})
+    return jsonify({'hash': filename})
 
-@app.route('/file/<types>',methods=['GET'])
+
+@app.route('/file/<types>', methods=['GET'])
 def get_list(types):
     files = next(os.walk(UPLOAD_FILE_PATH))[2]
-    files = list(filter(lambda x:x.startswith(types),files))
-    files.sort(key=lambda f:os.stat(os.path.join(UPLOAD_FILE_PATH,f)).st_mtime,reverse=True)
+    files = list(filter(lambda x: x.startswith(types), files))
+    files.sort(key=lambda f: os.stat(os.path.join(UPLOAD_FILE_PATH, f)).st_mtime, reverse=True)
     return jsonify(files)
+
 
 @app.route('/download/<path:filename>')
 def download(filename):
-    return send_from_directory(UPLOAD_FILE_PATH,filename, cache_timeout=3600)
+    return send_from_directory(UPLOAD_FILE_PATH, filename, cache_timeout=3600)
+
 
 @app.route('/work')
 def work():
     ref_img = request.args.get('ref_img')
-    ref_img_filename = os.path.join(UPLOAD_FILE_PATH,secure_filename(ref_img))
+    ref_img_filename = os.path.join(UPLOAD_FILE_PATH, secure_filename(ref_img))
     src_img = request.args.get('src_img')
-    src_img_filename = os.path.join(UPLOAD_FILE_PATH,secure_filename(src_img))
-    al = request.args.get('alg','reinhard')
+    src_img_filename = os.path.join(UPLOAD_FILE_PATH, secure_filename(src_img))
+    al = request.args.get('alg', 'reinhard')
     if not os.path.isfile(ref_img_filename) or not os.path.isfile(src_img_filename):
-        return jsonify({'msg':'请选择图片','code':1}),400
-    out_img = str(round(time.time() * 1000))+'.jpg'
-    out_img_file = os.path.join(UPLOAD_FILE_PATH,out_img)
+        return jsonify({'msg': '请选择图片', 'code': 1}), 400
+    out_img = str(round(time.time() * 1000)) + '.jpg'
+    out_img_file = os.path.join(UPLOAD_FILE_PATH, out_img)
     if al == 'reinhard':
-        reinhard(src_img_filename,ref_img_filename,out_img_file)
+        reinhard(src_img_filename, ref_img_filename, out_img_file)
     elif al == 'welsh':
-        welsh(src_img_filename,ref_img_filename,out_img_file)
+        welsh(src_img_filename, ref_img_filename, out_img_file)
     else:
         abort(400)
-    insert_file(out_img.split('.')[0],src_img,ref_img,out_img,al)
-    return jsonify({'redirect':'show'})
+    insert_file(out_img.split('.')[0], src_img, ref_img, out_img, al)
+    return jsonify({'redirect': 'show'})
+
 
 @app.route('/show')
 def show():
-    return send_from_directory('static','submission.html')
+    return send_from_directory('static', 'submission.html')
+
 
 @app.route('/submission')
 def submission():
     return jsonify(query_db('select * from result order by id desc'))
 
+
 @app.route('/submission/del/<int:id>')
 def submission_del(id):
-    row = query_db('select * from result where id = ?',(id,),one=True)
-    filenames = [row['src_img'],row['res_img'],row['ref_img']]
+    row = query_db('select * from result where id = ?', (id,), one=True)
+    filenames = [row['src_img'], row['res_img'], row['ref_img']]
     for row_name in row:
         if row[row_name] not in filenames:
             continue
-        size = query_db('select count(1) from result where {} = ?1'.format(row_name),(row[row_name],),one=True)
+        size = query_db('select count(1) from result where {} = ?1'.format(row_name), (row[row_name],), one=True)
         if 1 < int(size['count(1)']):
             filenames.remove(row[row_name])
 
     for i in filenames:
         try:
-            os.remove(os.path.join(UPLOAD_FILE_PATH,i))
+            os.remove(os.path.join(UPLOAD_FILE_PATH, i))
         except IOError:
             pass
     del_file(id)
-    return redirect(url_for('show',_external=True))
+    return redirect(url_for('show', _external=True))
+
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(host='0.0.0.0',port=8080)
+    app.run(host='0.0.0.0', port=8080)
