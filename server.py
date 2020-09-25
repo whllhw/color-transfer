@@ -9,6 +9,7 @@ import time
 from db import *
 
 os.environ['LD_LIBRARY_PATH'] = './lib'
+print(os.environ['LD_LIBRARY_PATH'])
 
 app = Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
