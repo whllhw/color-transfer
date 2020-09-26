@@ -8,8 +8,7 @@ from src.welsh.main import work as welsh
 import time
 from db import *
 
-os.environ['LD_LIBRARY_PATH'] = './lib'
-print(os.environ['LD_LIBRARY_PATH'])
+os.environ['LD_LIBRARY_PATH'] = '/'.join(__file__.split('/')[:-1]) + '/lib'
 
 app = Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
