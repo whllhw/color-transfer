@@ -1,10 +1,10 @@
 # coding:utf-8
 from multiprocessing import Process
+import ctypes
+import _ctypes
 
 
 def do_work(src_img, ref_img, out_img):
-    import ctypes
-    import _ctypes
     welsh_lib = ctypes.cdll.LoadLibrary('src/welsh/libWelsh.so')
     welsh_lib.welsh(ctypes.c_char_p(src_img.encode('utf-8')), ctypes.c_char_p(ref_img.encode('utf-8')),
                     ctypes.c_char_p(out_img.encode('utf-8')))

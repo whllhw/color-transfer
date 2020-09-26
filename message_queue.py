@@ -1,22 +1,29 @@
 # coding: utf-8
-import redis
+import redis_db
 import json
 import logger
 
 
 class ProcessQueue(object):
+    """
+    利用redis实现消息队列
+    """
+    # 待消费队列
     KEY_NAME = 'app:img:queue'
+    # 待确认消息有序集合
     WAIT_NAME = 'app:img:wait_ack'
 
     def __init__(self):
-        self.pool = redis.ConnectionPool(host='127.0.0.1', port=6379, decode_responses=True)
-        self.r = redis.Redis(connection_pool=self.pool)
+        self.r = redis_db.get_connect()
         self.log = logger.get_log(ProcessQueue)
 
     def r(self):
         return self.r
 
     def push(self, p_id, src_png, des_png, alg):
+        """
+        将消息放入队列末尾
+        """
         raw_content = json.dumps({
             'src_png': src_png,
             'des_png': des_png,
@@ -26,8 +33,11 @@ class ProcessQueue(object):
         self.r.rpush(ProcessQueue.KEY_NAME, raw_content)
         self.log.info('rpush {} success, {}'.format(ProcessQueue.KEY_NAME, raw_content))
 
-    def pop(self):
-        raw_tuple = self.r.blpop(ProcessQueue.KEY_NAME, timeout=5)
+    def pop(self, timeout=5):
+        """
+        弹出队首的消息，并将消息id放入待确认队列中
+        """
+        raw_tuple = self.r.blpop(ProcessQueue.KEY_NAME, timeout=timeout)
         if not raw_tuple:
             self.log.info('blpop timeout, {} is empty'.format(ProcessQueue.KEY_NAME))
             return None
@@ -38,6 +48,9 @@ class ProcessQueue(object):
         return content
 
     def ack(self, p_id):
+        """
+        消息消费完毕，将消息id移出待确认队列
+        """
         self.r.zrem(ProcessQueue.WAIT_NAME, p_id)
         self.log.info('zrem {} success, {}'.format(ProcessQueue.WAIT_NAME, p_id))
 
