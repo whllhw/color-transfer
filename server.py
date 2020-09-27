@@ -3,16 +3,18 @@ from flask import Flask, request, send_from_directory, flash, redirect, url_for,
 import os
 from werkzeug.utils import secure_filename
 
-from src.reinhard.main import work as reinhard
-from src.welsh.main import work as welsh
+import color_transfer
 import time
 from db import *
+from logger import get_log
 
 os.environ['LD_LIBRARY_PATH'] = '/'.join(__file__.split('/')[:-1]) + '/lib'
 
 app = Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 UPLOAD_FILE_PATH = 'uploads/'
+
+executor = color_transfer.Executor()
 
 
 @app.before_request
@@ -82,15 +84,10 @@ def work():
     al = request.args.get('alg', 'reinhard')
     if not os.path.isfile(ref_img_filename) or not os.path.isfile(src_img_filename):
         return jsonify({'msg': '请选择图片', 'code': 1}), 400
-    out_img = str(round(time.time() * 1000)) + '.jpg'
-    out_img_file = os.path.join(UPLOAD_FILE_PATH, out_img)
-    if al == 'reinhard':
-        reinhard(src_img_filename, ref_img_filename, out_img_file)
-    elif al == 'welsh':
-        welsh(src_img_filename, ref_img_filename, out_img_file)
-    else:
+    if al not in ['reinhard', 'welsh']:
         abort(400)
-    insert_file(out_img.split('.')[0], src_img, ref_img, out_img, al)
+    r_id = insert_file(src_img, ref_img, al)
+    executor.add_task(r_id, src_img, ref_img, al)
     return jsonify({'redirect': 'show'})
 
 

@@ -20,18 +20,13 @@ class ProcessQueue(object):
     def r(self):
         return self.r
 
-    def push(self, p_id, src_png, des_png, alg):
+    def push(self, raw_content):
         """
         将消息放入队列末尾
         """
-        raw_content = json.dumps({
-            'src_png': src_png,
-            'des_png': des_png,
-            'alg': alg,
-            'id': p_id
-        })
-        self.r.rpush(ProcessQueue.KEY_NAME, raw_content)
-        self.log.info('rpush {} success, {}'.format(ProcessQueue.KEY_NAME, raw_content))
+        content = json.dumps(raw_content)
+        self.r.rpush(ProcessQueue.KEY_NAME, content)
+        self.log.info('rpush {} success, {}'.format(ProcessQueue.KEY_NAME, content))
 
     def pop(self, timeout=5):
         """

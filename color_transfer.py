@@ -14,6 +14,12 @@ class ColorTransfer(object):
         self.log = logger.get_log(ColorTransfer)
 
     def run(self, src_img, ref_img, alg, out_img):
+        """
+        src_img: 源文件路径
+        ref_img: 参考文件路径
+        alg: 算法
+        out_img: 输出文件路径
+        """
         if alg == 'reinhard':
             cpp_alg = reinhard
         elif alg == 'welsh':
@@ -32,10 +38,10 @@ class FileStore(object):
     def __init__(self):
         self.log = logger.get_log(FileStore)
 
-    def upload(self):
+    def upload(self, file):
         pass
 
-    def download(self):
+    def download(self, file_name):
         pass
 
 
@@ -52,10 +58,32 @@ class Executor(object):
             if not content:
                 self.log.info('message queue is empty')
                 continue
+            # TODO
 
-    def add_task(self):
+    def add_file(self, file):
+        """
+        web上传文件
+        """
         pass
+
+    def download_file(self, file_name):
+        """
+        web下载文件
+        """
+        pass
+
+    def add_task(self, r_id, src_img, ref_img, alg):
+        """
+        web添加task
+        """
+        self.mq.push({
+            'id': r_id,
+            'src_img': src_img,
+            'ref_img': ref_img,
+            'alg': alg
+        })
 
 
 if __name__ == '__main__':
-    pass
+    executor = Executor()
+    executor.run_loop()

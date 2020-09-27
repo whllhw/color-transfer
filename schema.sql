@@ -20,12 +20,18 @@ PRAGMA foreign_keys = false;
 -- ----------------------------
 DROP TABLE IF EXISTS "result";
 CREATE TABLE "result" (
-  "id" INTEGER NOT NULL,
-  "src_img" TEXT,
-  "ref_img" TEXT,
-  "res_img" TEXT,
-  "alg" TEXT,
-  PRIMARY KEY ("id")
+  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "src_img" TEXT NOT NULL,
+  "ref_img" TEXT NOT NULL,
+  "res_img" TEXT NOT NULL,
+  "alg" TEXT NOT NULL,
+  "status" TEXT NOT NULL,
+  "add_time" TIMESTAMP NOT NULL
+);
+
+CREATE INDEX "main"."idx"
+ON "result" (
+  "add_time"
 );
 
 PRAGMA foreign_keys = true;
