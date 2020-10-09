@@ -25,7 +25,9 @@ class SqliteDB(object):
         update result set res_img = ? 
         where id = ?
         """
+        print(res_img, id)
         self.connection.execute(sql, (res_img, id))
+        self.connection.commit()
 
     def insert_file(self, src_img, ref_img, alg):
         self.connection.execute(

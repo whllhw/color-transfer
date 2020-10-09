@@ -1,5 +1,6 @@
 FROM tiangolo/uwsgi-nginx-flask:python3.7
 
+RUN pip install redis
 COPY . /home/ubuntu/color-transfer/
 ENV UWSGI_INI /home/ubuntu/color-transfer/config.ini
 ENV STATIC_PATH /home/ubuntu/color-transfer/static

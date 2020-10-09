@@ -8,12 +8,21 @@ services:
       - uploads:/home/ubuntu/color-transfer/uploads
     depends_on:
       - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
   consumer:
     build: .
+    command: ["python", "color_transfer.py"]
     volumes:
-      - uploads:/home/ubuntu/color-transfer/
-    command: ["python", "color-transfer.py"]
+      - uploads:/home/ubuntu/color-transfer/uploads
     depends_on:
       - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
   redis:
     image: "redis:alpine"
+
+volumes:
+  uploads:
