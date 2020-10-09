@@ -143,3 +143,5 @@ pip-selfcheck.json
 
 *.jpg
 *.png
+
+db.sqlite

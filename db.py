@@ -1,13 +1,19 @@
 # coding:utf-8
 import sqlite3
 import datetime
+import os
 
 
 class SqliteDB(object):
     DATABASE = 'db.sqlite'
 
     def __init__(self):
+        init = os.path.exists(SqliteDB.DATABASE)
         self.connection = sqlite3.connect(SqliteDB.DATABASE)
+        if not init:
+            with open('schema.sql') as f:
+                self.connection.executescript(f.read())
+                self.connection.commit()
 
     def close(self):
         if self.connection:
@@ -25,16 +31,15 @@ class SqliteDB(object):
         update result set res_img = ? 
         where id = ?
         """
-        print(res_img, id)
         self.connection.execute(sql, (res_img, id))
         self.connection.commit()
 
     def insert_file(self, src_img, ref_img, alg):
         self.connection.execute(
             """
-        insert into result('src_img', 'ref_img', 'alg', 'add_time', 'res_img') 
-        values (?,?,?,?,?)
-        """, (src_img, ref_img, alg, datetime.datetime.now(), '')
+        insert into result('src_img', 'ref_img', 'alg', 'add_time', 'res_img', 'status') 
+        values (?,?,?,?,?,?)
+        """, (src_img, ref_img, alg, datetime.datetime.now(), '', '')
         )
         cur = self.connection.execute(
             """
@@ -51,4 +56,5 @@ class SqliteDB(object):
 
 
 if __name__ == '__main__':
-    pass
+    db = SqliteDB()
+    print(db.query_db("select * from result"))
