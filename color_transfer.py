@@ -33,8 +33,13 @@ class ColorTransfer(object):
         else:
             raise Exception('unknown alg :' + alg)
         self.log.info('start color transfer out_img:{}'.format(out_img))
-        cpp_alg(src_img, ref_img, out_img)
-        self.log.info('color transfer success out_img:{}'.format(out_img))
+        exitcode = cpp_alg(src_img, ref_img, out_img)
+        if exitcode == 0:
+            self.log.info('color transfer success out_img:{}'.format(out_img))
+            return True
+        else:
+            self.log.error('cpp alg exitcode:{}'.format(exitcode))
+            return False
 
 
 class IdGenerator(object):
@@ -62,11 +67,11 @@ class FileStore(object):
     文件缓存池
     """
 
-    CACHE_KEY = 'img_file:'
+    CACHE_KEY = 'app:img_file:'
 
     def __init__(self):
         self.log = logger.get_log(FileStore)
-        self.base = './uploads'
+        self.base = 'uploads'
         self.r = redis_db.get_connect()
         self.id_gen = IdGenerator()
 
@@ -93,8 +98,8 @@ class FileStore(object):
         """
         生成唯一文件名、存储路径
         """
-        file_name = file_name.split('_')[0] \
-                    + str(self.id_gen.gen_id()) \
+        file_name = file_name.split('_')[0] + '_' \
+                    + str(self.id_gen.gen_id()) + '.' \
                     + file_name.split('.')[-1]
         file_path = os.path.join(self.base, file_name)
         return file_name, file_path
@@ -104,7 +109,7 @@ class FileStore(object):
         存放的所有前缀相符的文件名列表
         """
         file_name_list = self.r.keys(FileStore.CACHE_KEY + prefix + '*')
-        return file_name_list
+        return [name[len(FileStore.CACHE_KEY):] for name in file_name_list]
 
     def download(self, file_name):
         """
@@ -134,14 +139,20 @@ class Executor(object):
             out_img = 'res_.jpg'  # 等待生成文件名
             out_img, out_img_path = self.fs.get_save_path(out_img)
             try:
-                self.cf.run(src_img,
-                            ref_img,
-                            content['alg'],
-                            out_img_path)
-                self.mq.ack(content['id'])
-                self.fs.save_to_redis(out_img, out_img_path)
-                self.db.ack_file(content['id'], out_img)
+                success = self.cf.run(src_img,
+                                      ref_img,
+                                      content['alg'],
+                                      out_img_path)
+                if success:
+                    self.log.info(
+                        'alg run success, src_img: {}, ref_img: {}, out_img: {}'.format(src_img, ref_img, out_img))
+                    self.mq.ack(content['id'])
+                    self.fs.save_to_redis(out_img, out_img_path)
+                    self.db.ack_file(content['id'], out_img)
+                else:
+                    raise Exception('run failed')
             except:
+                # TODO 运行失败，需要重试
                 self.log.exception('processes failed')
 
     def add_task(self, r_id, src_img, ref_img, alg):

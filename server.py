@@ -12,7 +12,6 @@ os.environ['LD_LIBRARY_PATH'] = '/'.join(__file__.split('/')[:-1]) + '/lib'
 
 app = Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-UPLOAD_FILE_PATH = 'uploads/'
 
 executor = color_transfer.Executor()
 fs = color_transfer.FileStore()
@@ -74,6 +73,10 @@ def get_list(types):
 @app.route('/download/<path:filename>')
 def download(filename):
     file_path = fs.download(filename)
+    if not file_path:
+        abort(404)
+    if not os.path.exists(file_path):
+        abort(404)
     return helpers.send_file(file_path, cache_timeout=24 * 3600)
 
 

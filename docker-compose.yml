@@ -1,0 +1,19 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads:/home/ubuntu/color-transfer/uploads
+    depends_on:
+      - redis
+  consumer:
+    build: .
+    volumes:
+      - uploads:/home/ubuntu/color-transfer/
+    command: ["python", "color-transfer.py"]
+    depends_on:
+      - redis
+  redis:
+    image: "redis:alpine"

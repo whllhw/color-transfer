@@ -15,6 +15,7 @@ def work(src_img, ref_img, out_img):
     p = Process(target=do_work, args=(src_img, ref_img, out_img))
     p.start()
     p.join()
+    return p.exitcode
 
 
 if __name__ == '__main__':
