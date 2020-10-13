@@ -1,7 +1,7 @@
 version: '3'
 services:
   web:
-    build: .
+    image: "color"
     ports:
       - "8080:8080"
     volumes:
@@ -13,7 +13,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
   consumer:
-    build: .
+    image: "color"
     command: ["python", "color_transfer.py"]
     volumes:
       - uploads:/home/ubuntu/color-transfer/uploads
