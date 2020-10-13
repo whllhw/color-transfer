@@ -5,7 +5,7 @@ import os
 
 
 class SqliteDB(object):
-    DATABASE = 'db.sqlite'
+    DATABASE = 'db/db.sqlite'
 
     def __init__(self):
         init = os.path.exists(SqliteDB.DATABASE)

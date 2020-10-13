@@ -6,7 +6,7 @@ services:
       - "8080:8080"
     volumes:
       - uploads:/home/ubuntu/color-transfer/uploads
-      - db_sqlite:/home/ubuntu/color-transfer
+      - db_sqlite:/home/ubuntu/color-transfer/db
     depends_on:
       - redis
     environment:
@@ -17,7 +17,7 @@ services:
     command: ["python", "color_transfer.py"]
     volumes:
       - uploads:/home/ubuntu/color-transfer/uploads
-      - db_sqlite:/home/ubuntu/color-transfer
+      - db_sqlite:/home/ubuntu/color-transfer/db
     depends_on:
       - redis
     environment:
@@ -25,7 +25,10 @@ services:
       - REDIS_PORT=6379
   redis:
     image: "redis:alpine"
+    volumes:
+      - redis:/data
 
 volumes:
+  redis:
   uploads:
   db_sqlite:
