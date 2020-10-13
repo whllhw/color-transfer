@@ -50,7 +50,7 @@ def upload(types):
     if 'file' not in request.files:
         abort(400)
     file = request.files['file']
-    if not file:
+    if not file or 'image' not in file.mimetype:
         abort(400)
     filename = secure_filename(file.filename)
     if types == 'src':
